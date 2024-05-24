@@ -10,21 +10,41 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-// Texture
-const loader = new THREE.TextureLoader()
-// const texture = loader.load('/textures/door/color.jpg')
-const texture = loader.load('/textures/minecraft.png')
-// texture.minFilter = THREE.NearestFilter
-texture.magFilter = THREE.NearestFilter
-console.log('texture: ', texture)
 /**
  * Object
  */
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0xffffff, map: texture })
-const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
+const loader = new THREE.TextureLoader()
 
+// const material = new THREE.MeshBasicMaterial({ color: 0xffffff })
+const material = new THREE.MeshBasicMaterial({ color: 0xffff00 })
+const sphere = getSphereObject(material)
+
+const plane = getPlaneObject(material)
+plane.position.x = -1
+
+const torus = getTorusObject(material)
+torus.position.x = 1
+
+
+function getSphereObject(material) {
+    const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32)
+
+    return new THREE.Mesh(sphereGeometry, material)
+}
+
+function getTorusObject(material) {
+    const torusGeometry = new THREE.TorusGeometry(0.3, 0.2, 16, 32)
+
+    return new THREE.Mesh(torusGeometry, material)
+}
+
+function getPlaneObject(material) {
+    const planeGeometry = new THREE.PlaneGeometry(1, 1)
+
+    return new THREE.Mesh(planeGeometry, material)
+}
+
+scene.add(plane, sphere, torus)
 /**
  * Sizes
  */
@@ -33,8 +53,9 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', handleResize)
+
+function handleResize() {
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
@@ -46,7 +67,7 @@ window.addEventListener('resize', () =>
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
+}
 
 /**
  * Camera
@@ -76,9 +97,17 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 const clock = new THREE.Clock()
 
-const tick = () =>
-{
+function tick() {
     const elapsedTime = clock.getElapsedTime()
+
+    // Update objects
+    torus.rotation.x = 0.15 * elapsedTime
+    plane.rotation.x = 0.15 * elapsedTime
+    sphere.rotation.x = 0.15 * elapsedTime
+
+    torus.rotation.y = 0.1 * elapsedTime
+    plane.rotation.y = 0.1 * elapsedTime
+    sphere.rotation.y = 0.1 * elapsedTime
 
     // Update controls
     controls.update()
